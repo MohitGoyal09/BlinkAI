@@ -1,0 +1,51 @@
+# Dependencies
+node_modules/
+app/node_modules/
+
+# Build outputs
+dist/
+app/out/
+app/build/
+out/
+
+# Environment variables
+.env
+.env.development
+.env.local
+.env.*.local
+
+# Mastra / runtime
+.mastra/
+
+# Database files
+*.db
+*.db-*
+
+# Project data
+output.txt
+workspaces/
+data/
+coworker.pen
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE / editor
+.claude/
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Agent / AI config (local dev tooling, not for repo)
+app/.agent/
+*.pyc
+__pycache__/
+
+# Misc
+.sandbox-profiles/
+src/whatsapp-auth

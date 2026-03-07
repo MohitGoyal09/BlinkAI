@@ -1,0 +1,163 @@
+import type { StateCreator } from 'zustand'
+import type { AppStore } from '../useAppStore'
+import type { WhatsAppStatus, AllowlistEntry, GroupEntry } from '../../mastra-client'
+import {
+  fetchWhatsAppStatus,
+  connectWhatsApp,
+  disconnectWhatsApp,
+  logoutWhatsApp,
+  fetchWhatsAppAllowlist,
+  addToWhatsAppAllowlist,
+  removeFromWhatsAppAllowlist,
+  approveWhatsAppPairing,
+  fetchWhatsAppGroups,
+  addWhatsAppGroup,
+  updateWhatsAppGroup,
+  removeWhatsAppGroup,
+} from '../../mastra-client'
+
+export interface WhatsAppSlice {
+  waStatus: WhatsAppStatus
+  waAllowlist: AllowlistEntry[]
+  waLoaded: boolean
+  waPollingTimer: ReturnType<typeof setInterval> | null
+
+  loadWhatsAppStatus: () => Promise<void>
+  startWaPolling: () => void
+  stopWaPolling: () => void
+  waConnect: () => Promise<void>
+  waDisconnect: () => Promise<void>
+  waLogout: () => Promise<void>
+  loadWaAllowlist: () => Promise<void>
+  waAddAllowlist: (phone: string, label?: string) => Promise<void>
+  waRemoveAllowlist: (phone: string) => Promise<void>
+  waPair: (code: string) => Promise<{ ok: boolean; error?: string }>
+  waGroups: GroupEntry[]
+  loadWaGroups: () => Promise<void>
+  waAddGroup: (groupJid: string, groupName?: string, mode?: string) => Promise<void>
+  waUpdateGroup: (groupJid: string, updates: { enabled?: boolean; mode?: string; groupName?: string }) => Promise<void>
+  waRemoveGroup: (groupJid: string) => Promise<void>
+}
+
+let _loadWa: Promise<void> | null = null
+
+export const createWhatsAppSlice: StateCreator<AppStore, [], [], WhatsAppSlice> = (set, get) => ({
+  waStatus: { status: 'disconnected', qrDataUrl: null, connectedPhone: null },
+  waAllowlist: [],
+  waLoaded: false,
+  waPollingTimer: null,
+
+  loadWhatsAppStatus: async () => {
+    const fetcher = async () => {
+      const status = await fetchWhatsAppStatus()
+      set({ waStatus: status })
+    }
+
+    if (get().waLoaded) { fetcher().catch(() => {}); return }
+
+    if (!_loadWa) {
+      _loadWa = fetcher()
+        .then(() => set({ waLoaded: true }))
+        .catch(() => set({ waLoaded: true }))
+        .finally(() => { _loadWa = null })
+    }
+    return _loadWa
+  },
+
+  startWaPolling: () => {
+    const existing = get().waPollingTimer
+    if (existing) return
+    const timer = setInterval(async () => {
+      try {
+        const status = await fetchWhatsAppStatus()
+        set({ waStatus: status })
+      } catch {
+        // ignore polling errors
+      }
+    }, 2000)
+    set({ waPollingTimer: timer })
+  },
+
+  stopWaPolling: () => {
+    const timer = get().waPollingTimer
+    if (timer) {
+      clearInterval(timer)
+      set({ waPollingTimer: null })
+    }
+  },
+
+  waConnect: async () => {
+    const status = await connectWhatsApp()
+    set({ waStatus: status })
+    get().startWaPolling()
+  },
+
+  waDisconnect: async () => {
+    get().stopWaPolling()
+    const status = await disconnectWhatsApp()
+    set({ waStatus: status })
+  },
+
+  waLogout: async () => {
+    get().stopWaPolling()
+    await logoutWhatsApp()
+    set({ waStatus: { status: 'disconnected', qrDataUrl: null, connectedPhone: null } })
+  },
+
+  loadWaAllowlist: async () => {
+    try {
+      const items = await fetchWhatsAppAllowlist()
+      set({ waAllowlist: items })
+    } catch {
+      // ignore
+    }
+  },
+
+  waAddAllowlist: async (phone, label) => {
+    const items = await addToWhatsAppAllowlist(phone, label)
+    set({ waAllowlist: items })
+  },
+
+  waRemoveAllowlist: async (phone) => {
+    await removeFromWhatsAppAllowlist(phone)
+    const items = await fetchWhatsAppAllowlist()
+    set({ waAllowlist: items })
+  },
+
+  waPair: async (code) => {
+    const result = await approveWhatsAppPairing(code)
+    if (result.ok && result.items) {
+      set({ waAllowlist: result.items })
+    }
+    return { ok: result.ok, error: result.error }
+  },
+
+  waGroups: [],
+
+  loadWaGroups: async () => {
+    try {
+      const groups = await fetchWhatsAppGroups()
+      set({ waGroups: groups })
+    } catch {
+      // ignore
+    }
+  },
+
+  waAddGroup: async (groupJid, groupName, mode) => {
+    await addWhatsAppGroup(groupJid, groupName, mode)
+    const groups = await fetchWhatsAppGroups()
+    set({ waGroups: groups })
+  },
+
+  waUpdateGroup: async (groupJid, updates) => {
+    await updateWhatsAppGroup(groupJid, updates)
+    const groups = await fetchWhatsAppGroups()
+    set({ waGroups: groups })
+  },
+
+  waRemoveGroup: async (groupJid) => {
+    await removeWhatsAppGroup(groupJid)
+    const groups = await fetchWhatsAppGroups()
+    set({ waGroups: groups })
+  },
+})

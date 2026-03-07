@@ -1,0 +1,65 @@
+{
+  "name": "coworker",
+  "version": "0.2.0",
+  "description": "Advanced Mastra AI coding agent with secure sandbox execution, comprehensive file management, and multi-language support for Python, JavaScript, and TypeScript development workflows",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "author": "Array Ventures",
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Array-Ventures/coworker.git"
+  },
+  "scripts": {
+    "predev": "node -e \"const {exec} = require('child_process'); exec('netstat -ano | findstr :4111', (err, stdout) => { if(stdout) { const pid = stdout.trim().split(/\\s+/).pop(); if(pid) exec('taskkill /F /PID ' + pid); } });\" 2>nul || exit 0",
+    "dev:win": "mastra dev",
+    "dev": "mastra dev",
+    "dev:app": "cd app && bun run dev",
+    "build": "mastra build",
+    "build:app": "cd app && bun run build",
+    "start": "mastra start",
+    "test": "bun test",
+    "test:watch": "bun test --watch"
+  },
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.1002.0",
+    "@aws-sdk/client-s3": "^3.1002.0",
+    "@aws-sdk/client-sqs": "^3.1002.0",
+    "@aws-sdk/lib-dynamodb": "^3.1002.0",
+    "@aws-sdk/s3-request-presigner": "^3.1002.0",
+    "@mastra/ai-sdk": "^1.0.5",
+    "@mastra/core": "^1.6.0",
+    "@mastra/e2b": "^0.0.3",
+    "@mastra/fastembed": "^1.0.0",
+    "@mastra/libsql": "^1.6.0",
+    "@mastra/loggers": "^1.0.2",
+    "@mastra/mcp": "^1.0.1",
+    "@mastra/memory": "^1.5.0",
+    "@mastra/observability": "^1.2.1",
+    "@mcp-ui/server": "^6.1.0",
+    "@modelcontextprotocol/ext-apps": "^1.0.1",
+    "@modelcontextprotocol/sdk": "^1.27.1",
+    "@types/dompurify": "^3.2.0",
+    "@whiskeysockets/baileys": "^7.0.0-rc.9",
+    "agent-browser": "^0.14.0",
+    "croner": "^10.0.1",
+    "dompurify": "^3.3.1",
+    "hono": "4.11.9",
+    "qrcode": "^1.5.4",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/node": "^24.10.9",
+    "@types/qrcode": "^1.5.6",
+    "mastra": "latest",
+    "typescript": "^5.9.3"
+  },
+  "overrides": {
+    "hono": "4.11.9"
+  }
+}

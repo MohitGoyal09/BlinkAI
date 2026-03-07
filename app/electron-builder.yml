@@ -1,0 +1,31 @@
+appId: com.coworker.app
+productName: Coworker
+directories:
+  buildResources: build
+files:
+  - '!**/.vite/**'
+  - '!src/**'
+  - '!electron.vite.config.*'
+  - '!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
+  - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
+publish:
+  provider: github
+  owner: Array-Ventures
+  repo: coworker
+mac:
+  target:
+    - dmg
+    - zip
+  artifactName: ${name}-${version}-${arch}.${ext}
+  hardenedRuntime: true
+  gatekeeperAssess: false
+  entitlements: build/entitlements.mac.plist
+  entitlementsInherit: build/entitlements.mac.plist
+  notarize: true
+win:
+  target:
+    - nsis
+linux:
+  target:
+    - AppImage
+    - deb

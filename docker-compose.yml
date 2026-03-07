@@ -1,0 +1,21 @@
+services:
+  coworker:
+    image: ghcr.io/array-ventures/coworker:latest
+    pull_policy: always
+    ports:
+      - '127.0.0.1:8080:8080'
+    environment:
+      - DATA_PATH=/data
+      - GOG_KEYRING_PASSWORD=${GOG_KEYRING_PASSWORD:-}
+      - MODEL=${MODEL:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - GOOGLE_GENERATIVE_AI_API_KEY=${GOOGLE_GENERATIVE_AI_API_KEY:-}
+      - GROQ_API_KEY=${GROQ_API_KEY:-}
+      - NVIDIA_API_KEY=${NVIDIA_API_KEY:-}
+      - KIMI_API_KEY=${KIMI_API_KEY:-}
+    volumes:
+      - data:/data
+
+volumes:
+  data:
