@@ -112,28 +112,63 @@ By the time he's done, **it's 2 PM and he hasn't started his actual work.**
 ```mermaid
 flowchart TB
     %% Core Interactions
-    Client["💻 Clients\n(Electron, WhatsApp, Web)"] --> Routes["🌐 API Routes\n(Harness / Messaging)"]
-    Routes --> Agent["🤖 Blink AI Agent\n(Mastra Framework)"]
+    subgraph Clients ["💻 User Interfaces"]
+        Electron["Electron App<br>(Desktop)"]
+        WhatsApp["WhatsApp<br>(Baileys)"]
+        Web["Web Widget<br>(React)"]
+    end
+
+    subgraph API ["🌐 API Routes"]
+        Harness["Harness Pool<br>(Thread Manager)"]
+        Router["Message Router<br>(Hono)"]
+    end
+
+    subgraph CoreAgent ["🤖 Blink AI Core (Mastra)"]
+        Agent["Main Agent<br>(BUILD/PLAN/FAST)"]
+        
+        subgraph SubAgents ["Specialized Sub-Agents"]
+            Execute["Execute & Plan"]
+            Voice["Voice Activity<br>(Deepgram)"]
+            Screen["Screen Analysis<br>(OCR)"]
+        end
+    end
     
     %% Agent internal capabilities
-    Agent --> Memory["🧠 Memory System\n(FastEmbed/Context)"]
-    Agent --> Tools["🔧 Tools Layer\n(Composio, MCP, Workspace)"]
+    subgraph Storage ["Local Storage"]
+        Memory["🧠 Memory System<br>(FastEmbed)"]
+        SQLite["💽 LibSQL<br>(Vector DB / Threads)"]
+    end
+
+    subgraph ToolsLayer ["🔧 Tools Layer"]
+        Tools["Tool Orchestrator"]
+        Composio["Composio Hub<br>(250+ Tools)"]
+        MCP["MCP Servers<br>(Community)"]
+        Workspace["Workspace<br>(File Ops)"]
+    end
     
     %% Enterprise Cloud Architecture
     subgraph AWSCloud ["☁️ AWS Cloud Infrastructure"]
-        S3["📦 Amazon S3\n(File & Object Storage)"]
-        Dynamo["⚡ Amazon DynamoDB\n(Knowledge Graph)"]
-        SQS["📨 Amazon SQS\n(Task Queue & Background)"]
+        S3["📦 Amazon S3<br>(File & Object Storage)"]
+        Dynamo["⚡ Amazon DynamoDB<br>(Knowledge Graph)"]
+        SQS["📨 Amazon SQS<br>(Task Queues)"]
     end
+    
+    Clients --> Router
+    Router --> Harness
+    Harness --> Agent
+    
+    Agent --> SubAgents
+    Agent --> Memory
+    Agent --> Tools
+    
+    Memory --> SQLite
+    
+    Tools --> Composio
+    Tools --> MCP
+    Tools --> Workspace
     
     Tools --> AWSCloud
     Agent --> AWSCloud
-
-    %% Local Storage
-    subgraph Local DB
-        SQLite["💽 LibSQL (SQLite)\n(Threads & Vector DB)"]
-    end
-    Memory --> SQLite
 
     %% AWS Theme styling
     classDef aws fill:#FF9900,stroke:#232F3E,stroke-width:2px,color:white;
