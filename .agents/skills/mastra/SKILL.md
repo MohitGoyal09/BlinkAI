@@ -27,7 +27,7 @@ ls node_modules/@mastra/
 ```
 
 - **If packages exist:** Use embedded docs first (most reliable)
-- **If no packages:** Install first or use remote docs
+- **If no packages:** Install first or use remote  docs
 
 ## Documentation lookup guide
 

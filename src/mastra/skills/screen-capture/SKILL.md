@@ -2,6 +2,7 @@
 description: Screen capture and analysis capabilities for visual AI assistance
 ---
 
+
 # Screen Capture Skill
 
 Enables the AI to see and analyze the user's screen for debugging, documentation, and visual assistance.

@@ -23,6 +23,7 @@ export class ToolRouterError extends Error {
 /**
  * Error thrown when authentication is required for a toolkit
  */
+
 export class AuthRequiredError extends ToolRouterError {
   constructor(
     public readonly linkUrl: string,

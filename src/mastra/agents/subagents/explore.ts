@@ -5,6 +5,7 @@
  * "research how module Y works") and uses read-only tools to explore
  * the workspace, then returns a concise summary of its findings.
  */
+
 import type { SubagentDefinition } from './types';
 
 export const exploreSubagent: SubagentDefinition = {
